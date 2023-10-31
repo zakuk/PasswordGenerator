@@ -115,10 +115,7 @@ namespace PasswordGenerator
         {
             string password;
             if (!LengthIsValid(Settings.PasswordLength, Settings.MinimumLength, Settings.MaximumLength))
-            {
-                password =
-                    $"Password length invalid. Must be between {Settings.MinimumLength} and {Settings.MaximumLength} characters long";
-            }
+                throw new ArgumentOutOfRangeException($"Password length invalid. Must be between {Settings.MinimumLength} and {Settings.MaximumLength} characters long");
             else
             {
                 var passwordAttempts = 0;
@@ -128,7 +125,9 @@ namespace PasswordGenerator
                     passwordAttempts++;
                 } while (passwordAttempts < Settings.MaximumAttempts && !PasswordIsValid(Settings, password));
 
-                password = PasswordIsValid(Settings, password) ? password : "Try again";
+                if (!PasswordIsValid(Settings, password))
+                    throw new ApplicationException("Failed to generate random password meeting configured uppercase, lowercase, numeric and  special character requirements. Ensure max generation attempts is set high enough.");
+
             }
 
             return password;
